@@ -18,15 +18,12 @@ class Router:
     def __init__(self) -> None:
         Routes = Dict[Station, Set[Station]]
         self._routes: Routes = collections.defaultdict(set)
-        self._known_stations: Set[Station] = set()
 
     def cross_link(self, station_a: Station, station_b: Station) -> None:
         """Register given stations cross linked.
         """
         self._routes[station_a].add(station_b)
         self._routes[station_b].add(station_a)
-        self._known_stations.add(station_a)
-        self._known_stations.add(station_b)
 
     def is_linked(self, from_station: Station, to_station: Station) -> bool:
         """Return True if from_station connected to to_station.
@@ -36,7 +33,7 @@ class Router:
                 return False
             scanned.add(from_station)
 
-            if to_station not in self._known_stations:
+            if to_station not in self._routes:
                 raise route.exceptions.UnknownStationError()
 
             try:
