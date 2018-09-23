@@ -30,10 +30,21 @@ class Router:
     def is_linked(self, from_station: Station, to_station: Station) -> bool:
         """Return True if from_station connected to to_station.
         """
-        if to_station not in self._known_stations:
-            raise route.exceptions.UnknownStationError()
+        def _is_linked(from_station: Station, scanned: Set[Station]) -> bool:
+            if from_station in scanned:
+                return False
+            scanned.add(from_station)
 
-        try:
-            return self._routes[from_station] == to_station
-        except KeyError:
-            raise route.exceptions.UnknownStationError()
+            if to_station not in self._known_stations:
+                raise route.exceptions.UnknownStationError()
+
+            try:
+                next_station = self._routes[from_station]
+            except KeyError:
+                raise route.exceptions.UnknownStationError()
+
+            if next_station == to_station:
+                return True
+            return _is_linked(next_station, scanned)
+
+        return _is_linked(from_station, set())
