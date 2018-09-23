@@ -1,6 +1,6 @@
 """Route Searcher
 """
-
+import collections
 from typing import (
     Dict,
     NamedTuple,
@@ -16,14 +16,15 @@ class Station(NamedTuple):
 
 class Router:
     def __init__(self) -> None:
-        self._routes: Dict[Station, Station] = {}
+        Routes = Dict[Station, Set[Station]]
+        self._routes: Routes = collections.defaultdict(set)
         self._known_stations: Set[Station] = set()
 
     def cross_link(self, station_a: Station, station_b: Station) -> None:
         """Register given stations cross linked.
         """
-        self._routes[station_a] = station_b
-        self._routes[station_b] = station_a
+        self._routes[station_a].add(station_b)
+        self._routes[station_b].add(station_a)
         self._known_stations.add(station_a)
         self._known_stations.add(station_b)
 
@@ -39,12 +40,13 @@ class Router:
                 raise route.exceptions.UnknownStationError()
 
             try:
-                next_station = self._routes[from_station]
+                next_stations = self._routes[from_station]
             except KeyError:
                 raise route.exceptions.UnknownStationError()
 
-            if next_station == to_station:
-                return True
-            return _is_linked(next_station, scanned)
+            return any(
+                next_station == to_station or _is_linked(next_station, scanned)
+                for next_station in next_stations
+            )
 
         return _is_linked(from_station, set())
