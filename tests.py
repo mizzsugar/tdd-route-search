@@ -1,4 +1,7 @@
+import pytest
+
 import route
+import route.exceptions
 
 
 def test_able_to_access():
@@ -10,3 +13,12 @@ def test_able_to_access():
     router.cross_link(yokohama, ohmiya)
     assert router.is_linked(yokohama, ohmiya)
     assert not router.is_linked(yokohama, ohshima)
+
+
+def test_not_exist_staiton():
+    yokohama = route.Station("横浜")
+    ohmiya = route.Station("大宮")
+    router = route.Router()
+
+    with pytest.raises(route.exceptions.UnknownStationError):
+        router.is_linked(yokohama, ohmiya)
