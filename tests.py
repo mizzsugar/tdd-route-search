@@ -47,3 +47,4 @@ def test_linked_indirectly():
     router.cross_link(ohmiya, utsunomiya)
 
     assert router.is_linked(yokohama, utsunomiya)
+    assert router.is_linked(utsunomiya, yokohama)
