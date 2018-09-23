@@ -6,6 +6,8 @@ from typing import (
     NamedTuple,
 )
 
+import route.exceptions
+
 
 class Station(NamedTuple):
     name: str
@@ -24,4 +26,7 @@ class Router:
     def is_linked(self, from_station: Station, to_station: Station) -> bool:
         """Return True if from_station connected to to_station.
         """
-        return self._routes[from_station] == to_station
+        try:
+            return self._routes[from_station] == to_station
+        except KeyError:
+            raise route.exceptions.UnknownStationError()
